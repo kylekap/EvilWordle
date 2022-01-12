@@ -69,6 +69,7 @@ def check_permutation(perm_dict, possible_words):
     for key in perm_dict:
         for word in possible_words:
             if fnmatch.fnmatch(word,key): #Currently including the other letters as a part of the wildcard... need to exclude.
+                #https://stackoverflow.com/questions/41471030/python-exclude-directory-with-fnmatch
                 perm_dict[key].append(word)
             continue
 
