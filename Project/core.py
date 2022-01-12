@@ -2,7 +2,7 @@
 
 import requests
 import itertools
-
+import fnmatch
 import config
 
 
@@ -49,65 +49,30 @@ def guess_dict(guess):
         [type]: [description]
     """    
     g_dict = {}
-    for L in range(1,len(''.join(set(guess)))+1):
-        for subset in itertools.combinations(guess,L):
+    for L in range(1,len(guess)+1):
+        for subset in itertools.permutations(guess+'?????',5): #? for wildcards in fnmatch. Need 5 in case there are no correct letters selected
             g_dict[''.join(subset)] = []
     return g_dict
 
 
-def check_with(letter_dict, possible_words):
+def check_permutation(perm_dict, possible_words):
     """[summary]
 
     Args:
-        letter_dict ([type]): [description]
-        possible_words ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """    
-    for word in possible_words:
-        for key in letter_dict:
-            if set(list(key)).issubset(list(word)):
-                letter_dict[key].append(word)
-    return letter_dict
-
-
-def check_without(letter_dict, possible_words):
-    """[summary]
-
-    Args:
-        letter_dict ([type]): [description]
-        possible_words ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """    
-    for word in possible_words:
-        for key in letter_dict:
-            if not set(list(key)).issubset(list(word)):
-                letter_dict[key].append(word)
-    return letter_dict
-
-
-def check_position(letter, possible_words):
-    """[summary]
-
-    Args:
-        letter ([type]): [description]
+        perm_dict ([type]): [description]
         possible_words ([type]): [description]
 
     Returns:
         [type]: [description]
     """
-    pos_dict = {}
-    
-    for pos in range(1,6-len(letter)):
-        next_pos = pos+len(letter)
+    #how to make faster?    
+    for key in perm_dict:
         for word in possible_words:
-            if word[pos:next_pos] == letter:            
-                pos_dict[pos].append(word)
-                continue
-    return pos_dict
+            if fnmatch.fnmatch(word,key): #Currently including the other letters as a part of the wildcard... need to exclude.
+                perm_dict[key].append(word)
+            continue
+
+    return perm_dict
 
 
 def main():
@@ -115,13 +80,12 @@ def main():
     """
     all_words = get_words()
     possible_words = all_words
-    #loop here
     guess = get_guess(possible_words)
-    a = check_with(guess_dict(guess),possible_words)
-    b = check_without(guess_dict(guess),possible_words)
-    for key in a:
-        print(key,'With:',len(a.get(key)),'Without:',len(b.get(key)))
-
+    a = check_permutation(guess_dict(guess),possible_words)
+    for k in sorted(a, key=lambda k: len(a[k]), reverse=False):
+        print(k,'With:',len(a.get(k)))
+    #Find the item with the highest value, that's where the word lies
+    #Then need to check if the guess has letters in the right positions or no
 
 if __name__ == '__main__':
     """[summary]
