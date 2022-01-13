@@ -36,11 +36,11 @@ def get_guess(possible_words):
         [type]: [description]
     """    
     while True:
-        guess = str(input("Enter a 5 Letter word:")).lower()
+        guess = str(input("Enter a 5 Letter word: ")).lower()
         if guess in set(possible_words):
             break
         else:
-            print("Must pick a valid 5 letter word!")
+            print("Must pick a valid 5 letter word!\n")
     return guess
     
 
@@ -65,26 +65,22 @@ def removeDupWithoutOrder(str):
 
 
 def check_permutation(perm_dict, possible_words,guess):
-    """[summary]
-
-    Args:
-        perm_dict ([type]): [description]
-        possible_words ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
     #how to make faster?
-    for key in perm_dict:
-        except_letters = ''
-        for letter in guess:
-            if letter not in key:
-                except_letters=removeDupWithoutOrder(except_letters+letter)
-        expr = key.replace('?',f'[^{except_letters}]')
-        for word in possible_words:
-            if None != re.match(expr,word):
-               perm_dict[key].append(word)
-               
+    try:
+        for key in perm_dict:
+            except_letters = ''
+            for letter in guess:
+                if letter not in key:
+                    except_letters=removeDupWithoutOrder(except_letters+letter)
+            if except_letters == '':
+                expr = key.replace('?',f'.')
+            else:
+                expr = key.replace('?',f'[^{except_letters}]')
+            for word in possible_words:
+                if None != re.match(expr,word):
+                   perm_dict[key].append(word)
+    except Exception as E:
+        print(f'{key}\n{except_letters}\nhad regex: {expr}\nand gave error: {E}')
     return perm_dict
 
 
@@ -110,11 +106,11 @@ def main():
     possible_words = all_words
 
     while True:
-        guess = get_guess(possible_words)
+        guess = get_guess(all_words)
         guess_history.append(guess)
         included_letters = ''
         result_set = check_permutation(guess_dict(guess),possible_words,guess)
-        max_key = max(result_set, key= lambda x: len(set(result_set[x])))
+        max_key = max(result_set, key= lambda x: len(set(result_set[x]))) #Need to fix what happens at 1 option as max key, currently accepts that as final, need to keep them guessing if possible?
         included_letters = max_key.replace('?','')
         possible_words = result_set.get(max_key)
 
@@ -124,7 +120,7 @@ def main():
         b = return_prompt.get('others','')
         c = len(result_set.get(max_key))
         print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nPossible words left: {c}')
-        print(result_set.get(max_key))
+        #print(result_set.get(max_key))
         if c == 1:
             print(f'Drat. You got it... the word was {a}')
             break
