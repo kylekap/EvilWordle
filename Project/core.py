@@ -1,4 +1,5 @@
 #https://realpython.com/python-pep8/
+#https://docs.python-guide.org/writing/structure/
 
 import requests
 import itertools
