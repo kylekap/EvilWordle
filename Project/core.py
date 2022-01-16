@@ -4,6 +4,7 @@
 import requests
 import itertools
 import re
+import time
 
 #import config
 
@@ -32,6 +33,30 @@ def get_words(min_length=5,max_length=5,capitalization='lower'):
                 WordList.append(word.lower())
     return WordList
 
+#currently unused
+def wildcard_string_match(val,pattern,wildcard='?',wildcard_exclude=''):
+    """Generate a TRUE / FALSE for matching the given value against a pattern. Enables wildcard searching & excludable characters from wildcard.
+
+    Args:
+        val (string): Value to check if matches.
+        pattern (string): Pattern to check the val against.
+        wildcard (str, optional): Wildcard character used in pattern. Defaults to '?'.
+        wildcard_exclude (str, optional): Characters to exclude from wildcard. Defaults to ''.
+
+    Returns:
+        bool : TRUE == match, FALSE == no match
+    """
+    
+    if len(val) == 0 or len(pattern) == 0:
+        return True
+    
+    if val[0] in wildcard_exclude:
+        return False
+    elif pattern[0] == wildcard or pattern[0] == val[0]:
+        return wildcard_string_match(val[1:],pattern[1:],wildcard,wildcard_exclude)
+    else:
+        return False
+    
 
 def get_guess(possible_answers,a=''):
     """Ask for a user input. Reject every input that's not in the list of possible_answers. Will format in same way (lower,upper,title) as possible_answers
@@ -51,11 +76,11 @@ def get_guess(possible_answers,a=''):
     else:
         a = 'lower'
 
-    possible_answers = (map(lambda x: x.lower(), possible_answers))
+    possible_answers = list(map(lambda x: x.lower(), possible_answers))
     while True:
         guess = str(input("Enter a 5 Letter word: ")).lower()
         
-        if guess in set(possible_answers):
+        if guess in possible_answers:
             break
         else:
             print("Must pick a valid 5 letter word!\n")
@@ -120,9 +145,10 @@ def check_permutation(perm_dict, possible_words,guess,wildcard_char='?'):
                 expr = key.replace('?',f'.')
             else:
                 expr = key.replace('?',f'[^{except_letters}]')
-            for word in possible_words:
-                if None != re.match(expr,word):
-                   perm_dict[key].append(word)
+
+            rx = re.compile(expr)
+            perm_dict[key] = list(filter(rx.match,possible_words))
+
     except Exception as E:
         print(f'{key}\n{except_letters}\nhad regex: {expr}\nand gave error: {E}')
     return perm_dict
@@ -154,13 +180,14 @@ def check_positional(actual,guess,included_letters):
 
 def main():
     """[summary]
-    """    
+    """
+    start_time = time.time()
     guess_history = []
     all_words = get_words()
     possible_words = all_words
-
     while True:
         guess = get_guess(all_words)
+        last_time = time.time()
         guess_history.append(guess)
         included_letters = ''
         result_set = check_permutation(guess_dict(guess),possible_words,guess)
@@ -173,13 +200,14 @@ def main():
         a = return_prompt.get('match','?????')
         b = return_prompt.get('others','')
         c = len(result_set.get(max_key))
-        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nPossible words left: {c}')
+        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nPossible words left: {c}\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
         #print(result_set.get(max_key))
         if c == 1:
             print(f'Drat. You got it... the word was {a}')
             break
         else:
             continue
+    
 
 if __name__ == '__main__':
     """[summary]
