@@ -13,7 +13,7 @@ with open('LICENSE') as f:
 
 setup(
     name='EvilWordle',
-    version='0.0.4',
+    version='0.1.0',
     description='Attempt at recreating the Evil version of Wordle',
     long_description=readme,
     author='Kyle Patterson',
