@@ -6,46 +6,57 @@
 import requests
 import itertools
 import re
+import csv
 
 #Local utilities
 import core_utils
 
-def get_words(min_length=5,max_length=5,capitalization='lower'):
+def get_words(min_length=5,max_length=5,capitalization='lower',use_file=''):
     """Gets a list of english words from instructables of a desired length.
 
     Args:
         min_length (int, optional): Keep words of this length or longer. Defaults to 5.
         min_length (int, optional): Keep words of this length or shorter. Defaults to 5.
         capitalizaton (string, optional): Capitalization rules of the word list to return (lower, upper, title). Defaults to lower.
+        use_local (boolean, optional): Alternatively, use a local copy for faster reference
 
     Returns:
         List: returns a lower case list of words meeting length requirements.
     """
     WordList = []
-    InitialList = requests.get("https://content.instructables.com/ORIG/FLU/YE8L/H82UHPR8/FLUYE8LH82UHPR8.txt").text
-    InitialList = str.splitlines(InitialList)
-    for word in InitialList:
-        if len(word) >= min_length and len(word) <= max_length:
-            if capitalization.lower() == 'upper':
-                WordList.append(word.upper())
-            elif capitalization.lower() == 'title':
-                WordList.append(word.title())
-            else:
-                WordList.append(word.lower())
+
+    if len(use_file) > 0:
+        with open(f'Docs/{max_length}Words.csv', newline='') as f:
+            for row in csv.reader(f):
+                WordList.append(row[0])
+    else:
+        InitialList = requests.get("https://content.instructables.com/ORIG/FLU/YE8L/H82UHPR8/FLUYE8LH82UHPR8.txt").text
+        InitialList = str.splitlines(InitialList)
+        for word in InitialList:
+            if len(word) >= min_length and len(word) <= max_length:
+                if capitalization.lower() == 'upper':
+                    WordList.append(word.upper())
+                elif capitalization.lower() == 'title':
+                    WordList.append(word.title())
+                else:
+                    WordList.append(word.lower())
     return WordList
 
 
-def get_guess(possible_answers,a=''):
+def get_guess(possible_answers,word_case='',exit_phrase=''):
     """Ask for a user input. Reject every input that's not in the list of possible_answers. Will format in same way (lower,upper,title) as possible_answers
 
     Args:
         possible_answers (list): list of acceptable inputs (string)
-        case () : case of output desired. Defaults to same as possible_answers case style
+        word_case (string, optional) : case of output desired. Defaults to same as possible_answers case style. lower/upper/title
+        exit_phrase (string, optional): phrase/word to exit the input loop.
+        
     Returns:
-        string : users validated input in specified format
+        string : users validated input in specified format. Will return exit_phrase when utilized.
     """
-    if a != '' and a.lower().isin(['lower','upper','title']):
-        a = a
+    
+    if word_case != '' and word_case.lower().isin(['lower','upper','title']):
+        a = word_case
     elif possible_answers[0].isupper():
         a = 'upper'
     elif possible_answers[0].istitle():
@@ -54,10 +65,14 @@ def get_guess(possible_answers,a=''):
         a = 'lower'
 
     possible_answers = list(map(lambda x: x.lower(), possible_answers))
+
+    print(f"You can always type '{exit_phrase}' to give up")
     while True:
         guess = str(input("Enter a 5 Letter word: ")).lower()
         
-        if guess in possible_answers:
+        if guess.lower() == exit_phrase.lower():
+            return exit_phrase
+        elif guess in possible_answers:
             break
         else:
             print("Must pick a valid 5 letter word!\n")
@@ -143,15 +158,29 @@ def check_positional(actual,guess,included_letters):
     return val
 
 
+def incorrect_letters(guess_hist,included_letters):
+    letters = core_utils.removeDupWithoutOrder(''.join(guess_hist))
+    bad_letters = ''
+    for lett in letters:
+        if lett not in included_letters:
+            bad_letters = bad_letters+lett
+    return ''.join(sorted(bad_letters))
+
+
 def main():
     """[summary]
     """
     #start_time = time.time()
     guess_history = []
-    all_words = get_words()
+    all_words = get_words(use_file=r'Docs/5Words.CSV')
     possible_words = all_words
+
     while True:
-        guess = get_guess(all_words)
+        exit_phrase = 'surrender'
+        guess = get_guess(all_words,exit_phrase=exit_phrase)
+        if guess == exit_phrase:
+            print('Giving up so soon? See you next time!')
+            break
         #last_time = time.time()
         guess_history.append(guess)
         included_letters = ''
@@ -169,13 +198,14 @@ def main():
 
         possible_words = core_utils.removeListDups(possible_words,guess_history) #remove all guessed words
         included_letters = max_key.replace('?','')
+        non_included_letters = incorrect_letters(guess_history,included_letters)
 
         #Then need to check if the guess has letters in the right positions or no
         return_prompt = check_positional(max_key,guess,included_letters)
         a = return_prompt.get('match','?????')
         b = return_prompt.get('others','')
         c = len(possible_words)
-        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
+        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nIncorrect letters: {non_included_letters}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
         if c == 0:
             print(f'Drat. You got it... the word was {a}')
             break
