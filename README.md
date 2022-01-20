@@ -10,10 +10,11 @@ Goal of the program
 4. Keep them guessing as long as possible
 
 Todo:
-- [X] Initial release!
-- [ ] Find more complete list of words
-- [ ] Add ability to give up
-- [ ] Optimize guess evaluation time
-- [ ] \(Optional) GUI Interface
+- [X] Initial release! :fireworks:
+- [ ] Add ability to give up :confounded:
+- [ ] Show letters guessed but not included :page_with_curl:
+- [ ] Optimize guess evaluation time :hourglass:
+- [ ] \(Optional) Find more complete list of words :closed_book:
+- [ ] \(Optional) GUI Interface  :computer:
 
 <!--[Format Guideline](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)-->
