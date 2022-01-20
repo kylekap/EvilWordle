@@ -1,7 +1,7 @@
-# It's a lot like Wordle, but... evil
+# It's a lot like [Wordle](https://www.powerlanguage.co.uk/wordle/), but... evil
 
 ## What it is
-My attempt at recreating the experience of [Evil Wordle :smiling_imp:](https://swag.github.io/evil-wordle/) as a project in Python.
+My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_imp:](https://swag.github.io/evil-wordle/) as a project in Python.
 
 
 ## Goal of the program
@@ -11,11 +11,12 @@ My attempt at recreating the experience of [Evil Wordle :smiling_imp:](https://s
 3. Inform user of how many words remain
 4. Keep them guessing as long as possible
 
-## To Do:
+## To Do
 - [X] Initial release! :fireworks:
 - [ ] Add ability to give up :confounded:
 - [ ] Show letters guessed but not included :page_with_curl:
 - [ ] Optimize guess evaluation time :hourglass:
+- [ ] \(Optional) Add ability to play against other lengths of words
 - [ ] \(Optional) Find more complete list of words :closed_book:
 - [ ] \(Optional) GUI Interface  :computer:
 
