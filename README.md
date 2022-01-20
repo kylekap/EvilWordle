@@ -12,7 +12,7 @@ My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_i
 4. Keep them guessing as long as possible
 
 ## To Do
-- [X] Initial release! :fireworks:
+- [X] Initial release! :sparkler:
 - [ ] Add ability to give up :confounded:
 - [ ] Show letters guessed but not included :page_with_curl:
 - [ ] Optimize guess evaluation time :hourglass:
