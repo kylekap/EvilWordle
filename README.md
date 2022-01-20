@@ -1,6 +1,6 @@
-# EvilWordle
- 
-Attempt to recreate the [Evil Worlde](https://swag.github.io/evil-wordle/) project in Python.
+# Wordle, but mean
+
+My attempt at recreating the experience of [Evil Wordle :smiling_imp:](https://swag.github.io/evil-wordle/) as a project in Python.
 
 Goal of the program
 
