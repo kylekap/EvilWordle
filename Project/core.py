@@ -122,6 +122,10 @@ def removeDupWithoutOrder(str):
     return "".join(set(str)) 
 
 
+def removeListDups(base_list,remove_list):
+    return [x for x in base_list if x not in remove_list]
+
+
 def check_permutation(perm_dict, possible_words,guess,wildcard_char='?'):
     """[summary]
 
@@ -178,6 +182,23 @@ def check_positional(actual,guess,included_letters):
     return val
 
 
+def remove_empty_dict(dict_name):
+    """Remove dict items with no values
+
+    Args:
+        dict_name (dict): dictionary to remove empty items from
+
+    Returns:
+        dict : dictionary with empty keys removed
+    """    
+    return_dict = {}
+    
+    for key in dict_name:
+        if dict_name[key]:
+            return_dict[key] = dict_name.get(key) 
+    return return_dict
+
+
 def main():
     """[summary]
     """
@@ -190,24 +211,33 @@ def main():
         last_time = time.time()
         guess_history.append(guess)
         included_letters = ''
-        result_set = check_permutation(guess_dict(guess),possible_words,guess)
+        result_set = remove_empty_dict(check_permutation(guess_dict(guess),possible_words,guess))
+        
         max_key = max(result_set, key= lambda x: len(set(result_set[x]))) #Need to fix what happens at 1 option as max key, currently accepts that as final, need to keep them guessing if possible?
+        min_key = min(result_set, key= lambda x: len(set(result_set[x])))
+
+        if len(result_set.get(min_key)) == len(result_set.get(max_key)): #if we're down to 1 option per set, need to switch up logic to keep user guessing
+            possible_words = []
+            for key in result_set:
+                possible_words.append(result_set.get(key)[0])
+        else:
+            possible_words = result_set.get(max_key)
+
+        possible_words = removeListDups(possible_words,guess_history) #remove all guessed words
         included_letters = max_key.replace('?','')
-        possible_words = result_set.get(max_key)
 
         #Then need to check if the guess has letters in the right positions or no
         return_prompt = check_positional(max_key,guess,included_letters)
         a = return_prompt.get('match','?????')
         b = return_prompt.get('others','')
-        c = len(result_set.get(max_key))
+        c = len(possible_words)
         print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nPossible words left: {c}\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
-        #print(result_set.get(max_key))
-        if c == 1:
+        if c == 0:
             print(f'Drat. You got it... the word was {a}')
             break
         else:
             continue
-    
+
 
 if __name__ == '__main__':
     """[summary]
