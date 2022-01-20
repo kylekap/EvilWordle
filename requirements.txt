@@ -2,6 +2,7 @@
 requests
 itertools
 re
+csv
 sys
 os
 
