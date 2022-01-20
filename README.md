@@ -16,7 +16,7 @@ My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_i
 - [ ] Add ability to give up :confounded:
 - [ ] Show letters guessed but not included :page_with_curl:
 - [ ] Optimize guess evaluation time :hourglass:
-- [ ] \(Optional) Add ability to play against other lengths of words
+- [ ] \(Optional) Add ability to play against other lengths of words :straight_ruler:
 - [ ] \(Optional) Find more complete list of words :closed_book:
 - [ ] \(Optional) GUI Interface  :computer:
 
