@@ -1,4 +1,4 @@
-# It's a lot like [Wordle](https://www.powerlanguage.co.uk/wordle/), but... evil
+# It's a lot like [Wordle](https://www.powerlanguage.co.uk/wordle/), but... mean
 
 ## What it is
 My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_imp:](https://swag.github.io/evil-wordle/) as a project in Python.
@@ -11,17 +11,23 @@ My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_i
 3. Inform user of how many words remain
 4. Keep them guessing as long as possible
 
-## To Do
-- [ ] Identify issues in check_permutations, see function for details
+## To Do, Program
+- [X] Identify issues in check_permutations, see function for details
+- [ ] Idenfity issues in leaving guesses in available words for 1 loop too long
 - [X] Initial release! :sparkler:
 - [X] Add ability to give up :confounded:
 - [X] Show letters guessed but not included :page_with_curl:
 - [ ] Optimize guess evaluation time :hourglass:
-- [ ] Add Flask support
-- [ ] Deploy as webpage
+- [ ] Deploy as webpage, see Flask to do list below
 - [ ] \(Optional) Add ability to play against other lengths of words :straight_ruler:
 - [X] \(Optional) Find more complete list of words :closed_book:
 
+## To Do, Flask
+- [ ] Add Flask support
+- [ ] Instanced playthrough
+- [ ] Solve caching issues
+- [ ] Deploy online
+- [ ] \(Optional) Generate GUI for playthrough?
 
 ## Resources utilized
 1. [Primary Word List - Instructables](https://content.instructables.com/ORIG/FLU/YE8L/H82UHPR8/FLUYE8LH82UHPR8.tx)
