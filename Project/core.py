@@ -229,7 +229,7 @@ def main():
             possible_words = result_set.get(max_key)
 
         possible_words = core_utils.removeListDups(possible_words,guess_history) #remove all guessed words
-        included_letters = max_key.replace('?','')
+        included_letters = max_key.replace('?','') #not working at 1.
         non_included_letters = incorrect_letters(guess_history,included_letters)
         unused = unused_letters(included_letters+non_included_letters)
         
@@ -241,6 +241,7 @@ def main():
             print(f'Drat. You got it... the word was {a}')
             break
         print(f'Current correct letters: {a}\nCurrent included letters: {included_letters}\nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
+
 
 if __name__ == '__main__':
     """[summary]
