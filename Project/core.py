@@ -9,6 +9,7 @@ import re
 import csv
 
 #Local utilities
+#import Project.
 import core_utils as core_utils
 
 def get_words(min_length=5,max_length=5,capitalization='lower',use_file=''):
@@ -122,6 +123,8 @@ def check_permutation(perm_dict, possible_words,guess,wildcard_char='?'):
         dict : perm_dict filled out with values being lists of words from possible_words that correlate to that key.
     """    
     #how to make faster?
+    #I think there might be an error in here, where if you guess a word like "catch" it'll leave in "cooch" but then say only one matches. 
+        # Think it's the double letters on inputs that's messing it up
     try:
         for key in perm_dict:
             except_letters = ''
@@ -152,7 +155,8 @@ def check_positional(actual,guess,included_letters):
     Returns:
         dict : dictionary with characters that 'match' and those that are in the solution but not in right position 'others'
     """
-    #I think there might be an error in here, where if you guess a word like "catch" it'll leave in "cooch" but then say 
+    #I think there might be an error in here, where if you guess a word like "catch" it'll leave in "cooch" but then say only one matches. 
+        # Think it's the double letters on inputs that's messing it up
     val = {'match':'','others':included_letters}
     for pos in range(0,len(guess)):
         if actual[pos] == guess[pos]: #If it's in the right spot, make sure to include it & remove from wrong pos letters.
@@ -232,12 +236,11 @@ def main():
         #Then need to check if the guess has letters in the right positions or no
         return_prompt = check_positional(max_key,guess,included_letters)
         a = return_prompt.get('match','?????')
-        b = return_prompt.get('others','')
         c = len(possible_words)
         if c == 0:
             print(f'Drat. You got it... the word was {a}')
             break
-        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
+        print(f'Current correct letters: {a}\nCurrent included letters: {included_letters}\nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
 
 if __name__ == '__main__':
     """[summary]
