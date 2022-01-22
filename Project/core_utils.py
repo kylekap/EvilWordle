@@ -19,8 +19,10 @@ def removeListDups(base_list,remove_list):
 
     Returns:
         list : list of items in base_list NOT in remove_list
-    """    
-    return [x for x in base_list if x not in remove_list]
+    """
+    res = []
+    [res.append(x) for x in base_list if x not in res]
+    return [x for x in res if x not in remove_list]
 
 
 def remove_empty_dict(dict_name):

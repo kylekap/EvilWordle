@@ -12,13 +12,16 @@ My attempt at recreating the experience of [:smiling_imp: Evil Wordle :smiling_i
 4. Keep them guessing as long as possible
 
 ## To Do
+- [ ] Identify issues in check_permutations, see function for details
 - [X] Initial release! :sparkler:
 - [X] Add ability to give up :confounded:
 - [X] Show letters guessed but not included :page_with_curl:
 - [ ] Optimize guess evaluation time :hourglass:
+- [ ] Add Flask support
+- [ ] Deploy as webpage
 - [ ] \(Optional) Add ability to play against other lengths of words :straight_ruler:
 - [X] \(Optional) Find more complete list of words :closed_book:
-- [ ] \(Optional) GUI Interface  :computer:
+
 
 ## Resources utilized
 1. [Primary Word List - Instructables](https://content.instructables.com/ORIG/FLU/YE8L/H82UHPR8/FLUYE8LH82UHPR8.tx)

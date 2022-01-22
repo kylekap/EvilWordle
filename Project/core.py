@@ -9,7 +9,7 @@ import re
 import csv
 
 #Local utilities
-import core_utils
+import core_utils as core_utils
 
 def get_words(min_length=5,max_length=5,capitalization='lower',use_file=''):
     """Gets a list of english words from instructables of a desired length.
@@ -43,7 +43,7 @@ def get_words(min_length=5,max_length=5,capitalization='lower',use_file=''):
     return WordList
 
 
-def get_guess(possible_answers,word_case='',exit_phrase=''):
+def get_guess(possible_guesses,remaining_words,word_case='',exit_phrase='',debug_phrase='',guess=''):
     """Ask for a user input. Reject every input that's not in the list of possible_answers. Will format in same way (lower,upper,title) as possible_answers
 
     Args:
@@ -57,25 +57,32 @@ def get_guess(possible_answers,word_case='',exit_phrase=''):
     
     if word_case != '' and word_case.lower().isin(['lower','upper','title']):
         a = word_case
-    elif possible_answers[0].isupper():
+    elif possible_guesses[0].isupper():
         a = 'upper'
-    elif possible_answers[0].istitle():
+    elif possible_guesses[0].istitle():
         a = 'title'
     else:
         a = 'lower'
 
-    possible_answers = list(map(lambda x: x.lower(), possible_answers))
+    possible_answers = list(map(lambda x: x.lower(), possible_guesses))
 
-    print(f"You can always type '{exit_phrase}' to give up")
-    while True:
-        guess = str(input("Enter a 5 Letter word: ")).lower()
+    #print(f"You can always type '{exit_phrase}' to give up")
+    if guess == '':
+        while True:
+            guess = str(input("Enter a 5 Letter word: ")).lower()
         
-        if guess.lower() == exit_phrase.lower():
-            return exit_phrase
-        elif guess in possible_answers:
-            break
-        else:
-            print("Must pick a valid 5 letter word!\n")
+            if guess.lower() == exit_phrase.lower():
+                return exit_phrase
+            if guess.lower() == debug_phrase.lower():
+                print(remaining_words)
+            elif guess in possible_guesses:
+                break
+            else:
+                print("Must pick a valid 5 letter word!\n")
+    elif guess in possible_guesses:
+        return guess
+    else:
+        return False
     
     if a == 'upper':
         return guess.upper()
@@ -144,7 +151,8 @@ def check_positional(actual,guess,included_letters):
 
     Returns:
         dict : dictionary with characters that 'match' and those that are in the solution but not in right position 'others'
-    """    
+    """
+    #I think there might be an error in here, where if you guess a word like "catch" it'll leave in "cooch" but then say 
     val = {'match':'','others':included_letters}
     for pos in range(0,len(guess)):
         if actual[pos] == guess[pos]: #If it's in the right spot, make sure to include it & remove from wrong pos letters.
@@ -167,6 +175,25 @@ def incorrect_letters(guess_hist,included_letters):
     return ''.join(sorted(bad_letters))
 
 
+def unused_letters(letters):
+    """Retuns all letters not in the input string
+
+    Args:
+        letters (string): letters already utilized (do not include)
+
+    Returns:
+        string : letters not in input
+    """    
+    letters_left = 'abcdefghijklmnopqrstuvwxyz'
+    
+    letters = core_utils.removeDupWithoutOrder(letters)
+    
+    for letter in letters:
+        letters_left = letters_left.replace(letter,'')
+    
+    return letters_left
+
+
 def main():
     """[summary]
     """
@@ -177,7 +204,8 @@ def main():
 
     while True:
         exit_phrase = 'surrender'
-        guess = get_guess(all_words,exit_phrase=exit_phrase)
+        debug_phrase = 'thefuck'
+        guess = get_guess(all_words,possible_words,exit_phrase=exit_phrase,debug_phrase=debug_phrase)
         if guess == exit_phrase:
             print('Giving up so soon? See you next time!')
             break
@@ -186,10 +214,10 @@ def main():
         included_letters = ''
         result_set = core_utils.remove_empty_dict(check_permutation(guess_dict(guess),possible_words,guess))
         
-        max_key = max(result_set, key= lambda x: len(set(result_set[x]))) #Need to fix what happens at 1 option as max key, currently accepts that as final, need to keep them guessing if possible?
+        max_key = max(result_set, key= lambda x: len(set(result_set[x])))
         min_key = min(result_set, key= lambda x: len(set(result_set[x])))
 
-        if len(result_set.get(min_key)) == len(result_set.get(max_key)): #if we're down to 1 option per set, need to switch up logic to keep user guessing
+        if len(result_set.get(min_key)) == len(result_set.get(max_key)) and len(result_set.get(max_key))==1: #if we're down to 1 option per set, need to switch up logic to keep user guessing
             possible_words = []
             for key in result_set:
                 possible_words.append(result_set.get(key)[0])
@@ -199,19 +227,17 @@ def main():
         possible_words = core_utils.removeListDups(possible_words,guess_history) #remove all guessed words
         included_letters = max_key.replace('?','')
         non_included_letters = incorrect_letters(guess_history,included_letters)
-
+        unused = unused_letters(included_letters+non_included_letters)
+        
         #Then need to check if the guess has letters in the right positions or no
         return_prompt = check_positional(max_key,guess,included_letters)
         a = return_prompt.get('match','?????')
         b = return_prompt.get('others','')
         c = len(possible_words)
-        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nIncorrect letters: {non_included_letters}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
         if c == 0:
             print(f'Drat. You got it... the word was {a}')
             break
-        else:
-            continue
-
+        print(f'Current correct letters: {a}\nCurrent correct but non-ordered letters: {b}\nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
 
 if __name__ == '__main__':
     """[summary]
