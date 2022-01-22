@@ -20,9 +20,9 @@ def removeListDups(base_list,remove_list):
     Returns:
         list : list of items in base_list NOT in remove_list
     """
-    res = []
-    [res.append(x) for x in base_list if x not in res]
-    return [x for x in res if x not in remove_list]
+    #res = []
+    #[res.append(x) for x in base_list if x not in res] #why this line
+    return [x for x in base_list if x not in remove_list]
 
 
 def remove_empty_dict(dict_name):
@@ -64,3 +64,35 @@ def wildcard_string_match(val,pattern,wildcard='?',wildcard_exclude=''):
     else:
         return False
     
+def return_unused_chars(original,key):
+    unused_char = ''
+    for letter in original:
+        if letter in key:
+            key = key.replace(letter,'',1)    
+        else:
+            unused_char = unused_char+letter        
+    return unused_char
+
+def shared_letters(li,string=''):
+    if len(li) > 0:
+        if string != '' and len(string) == len(li[0]):
+            li.append(string)
+        shared = li[0]
+        for i in range(len(shared)):
+            for word in li:
+                if shared[i] == word[i]:
+                    continue
+                else:
+                    shared = shared[:i] + '?' + shared[i + 1:]
+                    break
+    else:
+        shared = string
+    return shared
+
+
+#if __name__ == '__main__':
+#    """[summary]
+#    """
+#    guess = 'cooch'
+#    li = ['fooch','pooch','ronch','dooch']
+#    print(shared_letters(guess,li))

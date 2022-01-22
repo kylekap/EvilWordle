@@ -127,10 +127,8 @@ def check_permutation(perm_dict, possible_words,guess,wildcard_char='?'):
         # Think it's the double letters on inputs that's messing it up
     try:
         for key in perm_dict:
-            except_letters = ''
-            for letter in guess:
-                if letter not in key:
-                    except_letters=core_utils.removeDupWithoutOrder(except_letters+letter)
+            except_letters = core_utils.return_unused_chars(guess,key)
+            except_letters=core_utils.removeDupWithoutOrder(except_letters)
             if except_letters == '':
                 expr = key.replace('?',f'.')
             else:
@@ -205,42 +203,63 @@ def main():
     guess_history = []
     all_words = get_words(use_file=r'Docs/5Words.CSV')
     possible_words = all_words
-
+    included_letters = ''
+    
     while True:
         exit_phrase = 'surrender'
-        debug_phrase = 'thefuck'
-        guess = get_guess(all_words,possible_words,exit_phrase=exit_phrase,debug_phrase=debug_phrase)
+        guess = get_guess(all_words,possible_words,exit_phrase=exit_phrase,debug_phrase='thefuck')
         if guess == exit_phrase:
             print('Giving up so soon? See you next time!')
             break
         #last_time = time.time()
-        guess_history.append(guess)
-        included_letters = ''
-        result_set = core_utils.remove_empty_dict(check_permutation(guess_dict(guess),possible_words,guess))
-        
+        guess_history.append(guess) #Track history of guesses
+
+        #get the dictionary of possible word formats, removing any with no words left.
+        result_set = core_utils.remove_empty_dict(check_permutation(guess_dict(guess),possible_words,guess)) 
+
+        #Find longest & shorted of the word formats. Will be 1 or greater, since removed empty above.        
         max_key = max(result_set, key= lambda x: len(set(result_set[x])))
         min_key = min(result_set, key= lambda x: len(set(result_set[x])))
 
-        if len(result_set.get(min_key)) == len(result_set.get(max_key)) and len(result_set.get(max_key))==1: #if we're down to 1 option per set, need to switch up logic to keep user guessing
+        '''
+        existing err....->
+        Last guess words left ['molls', 'polls']
+        guessed polls
+        Last Guess letters in right position: polls
+        Last Guesses included letters, wrong spot: molls
+        '''
+        #if we're down to 1 option per set, need to switch up logic to keep user guessing, otherwise maintain logic.
+        if len(result_set.get(min_key)) == len(result_set.get(max_key)) and len(result_set.get(max_key))==1:
             possible_words = []
             for key in result_set:
                 possible_words.append(result_set.get(key)[0])
         else:
             possible_words = result_set.get(max_key)
+        
+        #remove all guessed words.
+        #Err -> leaving in last guess?
+        possible_words = core_utils.removeListDups(possible_words,guess_history)
+        if guess in possible_words:
+            possible_words.remove(guess)
 
-        possible_words = core_utils.removeListDups(possible_words,guess_history) #remove all guessed words
-        included_letters = max_key.replace('?','') #not working at 1.
-        non_included_letters = incorrect_letters(guess_history,included_letters)
+        #Find what letters belong where, if they're included or not
+        included_letters = core_utils.shared_letters(possible_words,guess)
+        non_included_letters = incorrect_letters(guess_history,included_letters).replace('?','')
         unused = unused_letters(included_letters+non_included_letters)
         
-        #Then need to check if the guess has letters in the right positions or no
-        return_prompt = check_positional(max_key,guess,included_letters)
+        #Then to check if the guess has letters in the right positions or no
+        return_prompt = check_positional(included_letters,guess,included_letters.replace('?',''))
+        included_letters = included_letters.replace('?','')
         a = return_prompt.get('match','?????')
         c = len(possible_words)
-        if c == 0:
+        
+        if c == 0:#no more possible words
             print(f'Drat. You got it... the word was {a}')
             break
-        print(f'Current correct letters: {a}\nCurrent included letters: {included_letters}\nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
+
+        print(f'Last Guess letters in right position: {a}\nLast Guesses included letters, wrong spot: {included_letters}\
+              \nIncorrect letters: {non_included_letters}\nUnused letters: {unused}\nPossible words left: {c}') 
+            #\nTimeTaken iteration {round(time.time()-last_time,2)}, Overall {round(time.time()-start_time,2)}')
 
 
 if __name__ == '__main__':
