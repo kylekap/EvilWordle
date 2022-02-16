@@ -1,8 +1,6 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for
 import os
-from flask_caching import Cache
-from cachetools import cached, TTLCache
 import Project.core as core
 import Project.core_utils as core_utils
 
